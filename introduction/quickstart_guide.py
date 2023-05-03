@@ -53,7 +53,7 @@ print(chain.run("AI Chatbots for Dental Offices"))
 llm = OpenAI()
 
 get_all_tool_names()
-tools = load_tools(["llm-math"], llm=llm)
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
 
 # Finally, let's initialize an agent with the tools, the language model, and the type of agent we want to use.
 agent = initialize_agent(
@@ -62,7 +62,7 @@ agent = initialize_agent(
 
 # Now let's test it out!
 result = agent.run(
-    "In what year was python released and who is the original creator? Multiply the year by 3"
+    "What are the top 3 google maps search results for landscaping in Long Beach, CA?"
 )
 print(result)
 

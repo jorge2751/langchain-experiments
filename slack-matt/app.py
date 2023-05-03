@@ -5,7 +5,7 @@ from slack_bolt.adapter.flask import SlackRequestHandler
 from slack_bolt import App
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, request
-from functions import draft_email
+from functions import get_search_results, get_response_from_query
 
 # Load environment variables from .env file
 load_dotenv(find_dotenv())
@@ -56,6 +56,7 @@ def my_function(text):
 
 @app.event("app_mention")
 def handle_mentions(body, say):
+    
     """
     Event listener for mentions in Slack.
     When the bot is mentioned, this function processes the text and sends a response.
@@ -70,9 +71,23 @@ def handle_mentions(body, say):
     text = text.replace(mention, "").strip()
 
     say("Sure, I'll get right on that!")
-    # response = my_function(text)
-    response = draft_email(text)
+
+    # Extract niche, city, and state from the user input
+    try:
+        niche, city, state = [x.strip() for x in text.split(",")]
+    except ValueError:
+        say("Please provide the input in the format 'niche, city, state'")
+        return
+
+    # Get search results based on the extracted parameters
+    location = f"{city}, {state}"
+    print(niche, city, state)
+    search_results = get_search_results(niche, location)
+    print(search_results)
+    response = get_response_from_query(search_results, city)
+
     say(response)
+
 
 
 @flask_app.route("/slack/events", methods=["POST"])
@@ -89,4 +104,4 @@ def slack_events():
 
 # Run the Flask app
 if __name__ == "__main__":
-    flask_app.run()
+    flask_app.run(port=8080)

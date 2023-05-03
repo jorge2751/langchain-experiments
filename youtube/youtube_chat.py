@@ -40,18 +40,15 @@ def get_response_from_query(db, query, k=4):
 
     # Template to use for the system message prompt
     template = """
-        You are a helpful assistant that that can find greate quotes in youtube videos 
-        based on the video's transcript: {docs}
+        You are a helpful assistant that takes notes for a busy executive based on the provided youtube video's transcript: {docs}
         
-        Think about quotes that would make for great headlines and copy for social media posts.
-        
-        Your answers should be presented in a professional manner.
+        Think about the information that would be most beneficial, and present it in an easy to digest and professional manner.
         """
 
     system_message_prompt = SystemMessagePromptTemplate.from_template(template)
 
     # Human question prompt
-    human_template = "Provide some quotes or headlines for the following topic in the video transcript: {question}"
+    human_template = "Provide notes on this video: {question}"
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
 
     chat_prompt = ChatPromptTemplate.from_messages(
@@ -66,9 +63,9 @@ def get_response_from_query(db, query, k=4):
 
 
 # Example usage:
-video_url = "https://www.youtube.com/watch?v=2xxziIWmaSA&t=527s"
+video_url = "https://www.youtube.com/watch?v=LbT1yp6quS8"
 db = create_db_from_youtube_video_url(video_url)
 
-query = "langchain use cases"
+query = "LangChain Crash Course - Build apps with language models"
 response, docs = get_response_from_query(db, query)
 print(textwrap.fill(response, width=50))
