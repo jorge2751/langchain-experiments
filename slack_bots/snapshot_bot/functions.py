@@ -3,11 +3,6 @@ from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from dotenv import find_dotenv, load_dotenv
 from serpapi import GoogleSearch
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-)
 import os
 
 load_dotenv(find_dotenv())
