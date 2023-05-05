@@ -70,32 +70,41 @@ def handle_mentions(body, say):
     mention = f"<@{SLACK_BOT_USER_ID}>"
     text = text.replace(mention, "").strip()
 
-    say("Sure, I'll get right on that!")
-
     # Extract niche, city, and state from the user input
     try:
         niche, city, state = [x.strip() for x in text.split(",")]
     except ValueError:
         say("Please provide the input in the format 'niche, city, state'")
         return
-
+    
+    say(f"Running analysis for {niche} in {city}, {state}...")
+    
     # Use SnapshotBot to get the google front page results
+    say("Getting search results...")
     location = f"{city}, {state}"
-    map_pack, organic_results = SnapshotBot.get_search_results(niche, location)
+    search_results = SnapshotBot.get_search_results(niche, location)
     
-    processed_organic_results = SnapshotBot.filter_organic_results(organic_results)
-    say(str(processed_organic_results))
-    say(str(map_pack))
-    # Use SnapshotBot to get the map pack and organic results analysis
-    map_pack_analysis = SnapshotBot.get_map_pack_analysis(map_pack, city)
-    say(map_pack_analysis)
-    organic_analysis = SnapshotBot.get_organic_analysis(processed_organic_results, city)
-    say(organic_analysis)
+    # Use SnapshotBot to process the map pack and organic results
+    say("Cleaning search results to remove unnecessary data...")
+    processed_map_pack = SnapshotBot.process_map_pack(search_results.get('map_pack'))
+    processed_organic_results = SnapshotBot.process_organic_results(search_results.get('organic_results'))
     
-    # Use SnapshotBot to give final response
-    # response = SnapshotBot.final_analysis(map_pack_analysis, organic_analysis)
+    # Use SnapshotBot to count instances of prameters: city name in title, more than 10 reviews, and connected websites
+    say("Analyzing data...")
+    map_pack_analysis = SnapshotBot.analyze_map_pack(processed_map_pack, city)
+    
+    # Use SnapshotBot to count instances of parameters: city name in title, city name in link
+    organic_analysis = SnapshotBot.analyze_organic_results(processed_organic_results, city)
+    
+    # Use SnapshotBot to compare niche to types of map pack results and descriptions of organic results
+    type_and_description_analysis = SnapshotBot.analyze_types_and_descriptions(processed_map_pack, processed_organic_results, niche)
+    # say(str(type_and_description_analysis))
+    
+    say("Preparing your competition scores...")
+    # Use SnapshotBot to prepare the response in table format
+    table_response = SnapshotBot.prepare_response(map_pack_analysis, organic_analysis, type_and_description_analysis)
 
-    # say(response)
+    say(blocks=table_response)
 
 
 
